@@ -1,0 +1,539 @@
+diff --git a/changes.diff b/changes.diff
+index ab13c618..e69de29b 100644
+--- a/changes.diff
++++ b/changes.diff
+@@ -1,534 +0,0 @@
+-diff --git a/changes.diff b/changes.diff
+-index 9601efdc..e69de29b 100644
+---- a/changes.diff
+-+++ b/changes.diff
+-@@ -1,66 +0,0 @@
+--diff --git a/supabase/functions/form-finder/index.ts b/supabase/functions/form-finder/index.ts
+--index 389ad236..fb1398c5 100644
+----- a/supabase/functions/form-finder/index.ts
+--+++ b/supabase/functions/form-finder/index.ts
+--@@ -1,6 +1,6 @@
+-- import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+--+import { corsHeaders } from "../_shared/cors.ts"
+-- import {
+---  corsHeaders,
+--   createSupabaseClient,
+--   findContactFormLink,
+--   extractFormFields,
+--@@ -11,12 +11,41 @@ import { AI_MODELS, MAX_TOKENS } from '../utils/constants.ts'
+-- const supabase = createSupabaseClient()
+-- 
+-- serve(async (req) => {
+--+  let requestBody: string;
+--+  
+--+  console.log({
+--+    method: req.method,
+--+    headers: Object.fromEntries(req.headers),
+--+    url: req.url,
+--+  });
+--+
+--   if (req.method === 'OPTIONS') {
+--     return new Response('ok', { headers: corsHeaders })
+--   }
+-- 
+--   try {
+---    const { url, userId } = await req.json()
+--+    requestBody = await req.text();
+--+    console.log(`リクエストボディ: ${requestBody}`);
+--+
+--+    if (!requestBody) {
+--+      throw new Error('リクエストボディが空です');
+--+    }
+--+
+--+    const contentType = req.headers.get('content-type');
+--+    console.log(`Content-Type: ${contentType}`);
+--+
+--+    let parsedBody;
+--+    try {
+--+      parsedBody = JSON.parse(requestBody);
+--+    } catch (parseError) {
+--+      console.error(`JSONパースエラー: ${parseError}`);
+--+      throw new Error(`JSONの解析に失敗しました: ${parseError.message}`);
+--+    }
+--+
+--+    console.log(`解析されたデータ: ${JSON.stringify(parsedBody)}`);
+--+
+--+    const { url, userId } = parsedBody;
+--+
+--     if (!url || !userId) {
+--       throw new Error('URLとuserIdが必要です')
+--     }
+--@@ -40,8 +69,9 @@ serve(async (req) => {
+--     )
+--   } catch (error) {
+--     console.error(`エラーが発生しました: ${error.message}`);
+--+    console.error(`エラーのスタックトレース: ${error.stack}`);
+--     return new Response(
+---      JSON.stringify({ error: error.message }),
+--+      JSON.stringify({ error: error.message, stack: error.stack }),
+--       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+--     )
+--   }
+-diff --git a/dd/detail_design.md b/dd/detail_design.md
+-index 339f6512..577a8178 100644
+---- a/dd/detail_design.md
+-+++ b/dd/detail_design.md
+-@@ -565,6 +565,18 @@
+-   - company (TEXT): ユーザーの所属会社
+-   - avatar_url (TEXT): ユーザーのアバター画像URL
+-   - updated_at (TIMESTAMP): 最終更新日時
+-+  - phone (TEXT): ユーザーの電話番号
+-+  - gender (TEXT): ユーザーの性別
+-+  - name_kana (TEXT): ユーザー名のカナ表記
+-+  - email (TEXT): ユーザーのメールアドレス
+-+  - address (TEXT): ユーザーの住所
+-+  - birth_date (DATE): ユーザーの生年月日
+-+  - postal_code (TEXT): ユーザーの郵便番号
+-+  - prefecture (TEXT): ユーザーの都道府県
+-+  - city (TEXT): ユーザーの市区町村
+-+  - company_description (TEXT): ユーザーの会社の説明
+-+  - department (TEXT): ユーザーの部署
+-+  - job_title (TEXT): ユーザーの役職
+- - **インデックス**:
+-   - user_id (UNIQUE)
+- - **外部キー制約**:
+-@@ -610,8 +622,15 @@
+-   - content (TEXT): 生成されたコンテンツ
+-   - product (TEXT): 関連する製品名
+-   - search_keyword (TEXT): 使用された検索キーワード
+--  - status (TEXT): コンテンツの状態
+-+  - status (form_submission_status_type): タスクの状態 ('pending', 'success', 'form_not_found', 'submission_failed')
+-   - created_at (TIMESTAMP): コンテンツ生成日時
+-+  - updated_at (TIMESTAMP): 最終更新日時
+-+  - batch_job_id (UUID): 関連するバッチジョブのID（バッチ処理の場合のみ）
+-+  - attempt_count (INTEGER): 送信試行回数
+-+  - last_attempt_at (TIMESTAMP): 最後の送信試行日時
+-+  - error_message (TEXT): エラーが発生した場合のメッセージ
+-+  - preferred_method (TEXT): 優先送信方法 ('form' または 'dm')
+-+  - fallback_status (TEXT): フォールバック状態 ('not_needed', 'initiated', 'completed', 'failed')
+- - **インデックス**:
+-   - user_id
+-   - company_id
+-@@ -670,14 +689,90 @@
+- - **フィールド**:
+-   - id (UUID): 設定の一意識別子
+-   - user_id (UUID): 設定を所有するユーザーのID
+--  - api_key (TEXT): APIキー
+-   - selected_model (TEXT): 選択されたAIモデル
+-   - domain_restriction (TEXT): ドメイン制限
+-   - custom_prompt (TEXT): カスタムプロンプト
+-   - company_limit (INTEGER): 企業検索の制限数
+-   - created_at (TIMESTAMP): レコード作成日時
+-   - updated_at (TIMESTAMP): 最終更新日時
+-+  - preferred_method (TEXT): デフォルトの優先送信方法 ('form' または 'dm')
+-+  - anthropic_api_key (TEXT): Anthropic APIキー
+-+  - openai_api_key (TEXT): OpenAI APIキー
+- - **インデックス**:
+-   - user_id (UNIQUE)
+- - **外部キー制約**:
+--  - user_id REFERENCES auth.users(id) ON DELETE CASCADE
+-\ No newline at end of file
+-+  - user_id REFERENCES auth.users(id) ON DELETE CASCADE
+-+
+-+### 4.10 テーブル: batch_jobs
+-+- **説明**: バッチジョブ情報を管理するテーブル
+-+- **主キー**: id (UUID)
+-+- **フィールド**:
+-+  - id (UUID): ジョブの一意識別子
+-+  - user_id (UUID): ジョブを開始したユーザーのID
+-+  - status (TEXT): ジョブの状態（'pending', 'processing', 'completed', 'failed'）
+-+  - created_at (TIMESTAMP): ジョブの作成日時
+-+  - updated_at (TIMESTAMP): ジョブの最終更新日時
+-+  - total_tasks (INTEGER): 処理する必要のあるタスクの総数
+-+  - completed_tasks (INTEGER): 完了したタスクの数
+-+  - error_message (TEXT): エラーが発生した場合のメッセージ
+-+  - preferred_method (TEXT): このバッチジョブの優先送信方法 ('form' または 'dm')
+-+  - content_directives (TEXT): バッチジョブ固有のコンテンツ生成指示や注意事項
+-+- **インデックス**:
+-+  - user_id
+-+  - status
+-+- **外部キー制約**:
+-+  - user_id REFERENCES auth.users(id) ON DELETE CASCADE
+-+
+-+## 5. ワークフロー
+-+
+-+### 5.1 コンテンツ生成と送信プロセス
+-+1. バッチジョブの作成
+-+   - ユーザーがバッチジョブを開始
+-+   - `batch_jobs`テーブルに新しいレコードを作成
+-+   - ステータス: `pending`
+-+
+-+2. タスクの生成
+-+   - 選択された企業ごとに`generated_content`テーブルにレコードを作成
+-+   - 各タスクのステータス: `pending`
+-+
+-+3. バッチ処理の開始
+-+   - バッチジョブのステータスを`processing`に更新
+-+   - 各タスクを順次処理
+-+
+-+4. 個別タスクの処理
+-+   a. タスクステータスを`processing`に更新
+-+   b. コンテンツ生成
+-+      - AIモデルを使用してコンテンツを生成
+-+      - 生成されたコンテンツを`generated_content`テーブルに保存
+-+      - ステータス: `content_generated`
+-+
+-+   c. 送信方法の決定
+-+      - ユーザー設定またはジョブ設定に基づいて送信方法を決定
+-+      - DM優先の場合：
+-+        - DMの送信可能性を確認
+-+        - ステータス: `dm_check` → `dm_ready` または `fallback_to_form`
+-+      - フォーム優先の場合：
+-+        - フォーム検出
+-+        - ステータス: `form_detection` → `form_detected` または `fallback_to_dm`
+-+
+-+   d. 送信処理
+-+      - DM送信の場合：
+-+        - ステータス: `dm_preparation` → `dm_sending` → `dm_sent` または `dm_failed`
+-+      - フォーム送信の場合：
+-+        - ステータス: `form_data_prepared` → `auto_fill_ready` または `submission_in_progress` → `submitted_automatically` または `submission_failed`
+-+
+-+   e. フォールバック処理（必要な場合）
+-+      - ステータス: `fallback_initiated` → `completed` または `failed`
+-+
+-+   f. タスク完了
+-+      - タスクステータスを`completed`または`failed`に更新
+-+      - 処理結果を`result`フィールドに保存
+-+      - エラーがあれば`error_message`フィールドに記録
+-+
+-+5. バッチジョブの完了
+-+   - すべてのタスクが完了したらバッチジョブのステータスを`completed`に更新
+-+   - エラーが発生した場合は`failed`に更新し、エラー情報を記録
+-+
+-+6. 結果の通知
+-+   - ユーザーにバッチジョブの完了を通知
+-+   - 処理結果の概要を提供
+-\ No newline at end of file
+-diff --git a/dd/folder_tree.txt b/dd/folder_tree.txt
+-index d5807a7d..2b11909b 100644
+---- a/dd/folder_tree.txt
+-+++ b/dd/folder_tree.txt
+-@@ -57,75 +57,97 @@ src/
+- │   │       - コンポーネント間でのトースト状態の共有
+- │   │       - プログラム的なトースト制御の提供
+- │   │
+--├── Auth.tsx
+--│   説明: 認証コンポーネント
+--│   機能:
+--│   - ユーザーログインフォームの提供
+--│   - エラーハンドリングと表示
+--│   - 新規登録とパスワード忘れリンクの提供
+--│
+--├── AutomatedFormActions.tsx
+--│   説明: 自動化されたフォームアクションコンポーネント
+--│   機能:
+--│   - フォームの自動送信や処理
+--│   - ステータス更新の管理
+--│   - エラーハンドリング
+--│
+--├── ContentEditDialog.tsx
+--│   説明: コンテンツ編集ダイアログコンポーネント
+--│   機能:
+--│   - 生成されたコンテンツの編集インターフェース
+--│   - プレビューとエディタの切り替え
+--│   - 変更の保存と取り消し
+--│
+--├── DMSend.tsx
+--│   説明: DM送信コンポーネント
+--│   機能:
+--│   - 特定の企業にダイレクトメッセージを送信
+--│   - 送信中のローディング状態の表示
+--│   - 送信成功時のトースト通知
+--│
+--├── GenerateContent.tsx
+--│   説明: コンテンツ生成コンポーネント
+--│   機能:
+--│   - AIを使用して企業向けのカスタムコンテンツを生成
+--│   - 進捗状況の表示
+--│   - エラーハンドリングとユーザーへのフィードバック
+--│
+--├── GeneratedContentSection.tsx
+--│   説明: 生成されたコンテンツセクションコンポーネント
+--│   機能:
+--│   - 生成されたコンテンツの表示と管理
+--│   - コンテンツの編集、削除、コピー機能
+--│   - 検索とソート機能
+--│
+--├── Header.tsx
+--│   説明: ヘッダーコンポーネント
+--│   機能:
+--│   - アプリケーションの上部に表示される共通ヘッダー
+--│   - ナビゲーションリンクの提供
+--│   - ユーザー認証状態の表示と操作
+--│
+--├── PasswordStrengthMeter.tsx
+--│   説明: パスワード強度メーターコンポーネント
+--│   機能:
+--│   - パスワードの強度を視覚的に表示
+--│   - パスワードの複雑さに基づいた強度の計算
+--│   - ユーザーへのフィードバック提供
+--│
+--├── SearchCompany.tsx
+--│   説明: 企業検索コンポーネント
+--│   機能:
+--│   - 企業名や業種による検索機能
+--│   - 検索結果のリアルタイム表示
+--│   - 企業の選択と除外機能
+--│
+--├── Upload.tsx
+--│    説明: ファイルアップロードコンポーネント
+--│    機能:
+--│    - PDFファイルのアップロードと処理
+--│    - テキスト抽出とコンテンツ解析
+--│    - アップロード状態の管理とフィードバック
+-+│   ├── Auth.tsx
+-+│   │   説明: 認証コンポーネント
+-+│   │   機能:
+-+│   │   - ユーザーログインフォームの提供
+-+│   │   - エラーハンドリングと表示
+-+│   │   - 新規登録とパスワード忘れリンクの提供
+-+│   │
+-+│   ├── AutomatedFormActions.tsx
+-+│   │   説明: 自動化されたフォームアクションコンポーネント
+-+│   │   機能:
+-+│   │   - フォームの自動送信や処理
+-+│   │   - ステータス更新の管理
+-+│   │   - エラーハンドリング
+-+│   │
+-+│   ├── ContentEditDialog.tsx
+-+│   │   説明: コンテンツ編集ダイアログコンポーネント
+-+│   │   機能:
+-+│   │   - 生成されたコンテンツの編集インターフェース
+-+│   │   - プレビューとエディタの切り替え
+-+│   │   - 変更の保存と取り消し
+-+│   │
+-+│   ├── DMSend.tsx
+-+│   │   説明: DM送信コンポーネント
+-+│   │   機能:
+-+│   │   - 特定の企業にダイレクトメッセージを送信
+-+│   │   - 送信中のローディング状態の表示
+-+│   │   - 送信成功時のトースト通知
+-+│   │
+-+│   ├── GenerateContent.tsx
+-+│   │   説明: コンテンツ生成コンポーネント
+-+│   │   機能:
+-+│   │   - AIを使用して企業向けのカスタムコンテンツを生成
+-+│   │   - 進捗状況の表示
+-+│   │   - エラーハンドリングとユーザーへのフィードバック
+-+│   │
+-+│   ├── GeneratedContentSection.tsx
+-+│   │   説明: 生成されたコンテンツセクションコンポーネント
+-+│   │   機能:
+-+│   │   - 生成されたコンテンツの表示と管理
+-+│   │   - コンテンツの編集、削除、コピー機能
+-+│   │   - 検索とソート機能
+-+│   │
+-+│   ├── Header.tsx
+-+│   │   説明: ヘッダーコンポーネント
+-+│   │   機能:
+-+│   │   - アプリケーションの上部に表示される共通ヘッダー
+-+│   │   - ナビゲーションリンクの提供
+-+│   │   - ユーザー認証状態の表示と操作
+-+│   │
+-+│   ├── PasswordStrengthMeter.tsx
+-+│   │   説明: パスワード強度メーターコンポーネント
+-+│   │   機能:
+-+│   │   - パスワードの強度を視覚的に表示
+-+│   │   - パスワードの複雑さに基づいた強度の計算
+-+│   │   - ユーザーへのフィードバック提供
+-+│   │
+-+│   ├── SearchCompany.tsx
+-+│   │   説明: 企業検索コンポーネント
+-+│   │   機能:
+-+│   │   - 企業名や業種による検索機能
+-+│   │   - 検索結果のリアルタイム表示
+-+│   │   - 企業の選択と除外機能
+-+│   │
+-+│   ├── Upload.tsx
+-+│   │    説明: ファイルアップロードコンポーネント
+-+│   │    機能:
+-+│   │    - PDFファイルのアップロードと処理
+-+│   │    - テキスト抽出とコンテンツ解析
+-+│   │    - アップロード状態の管理とフィードバック
+-+│   │
+-+│   ├── BatchJobManager.tsx
+-+│   │   説明: バッチジョブ管理コンポーネント
+-+│   │   機能:
+-+│   │   - バッチジョブの作成と開始
+-+│   │   - ジョブの進捗状況の表示
+-+│   │   - 結果の概要表示
+-+│   │   - エラーハンドリングとリトライ操作
+-+│   │
+-+│   ├── TaskProgressDisplay.tsx
+-+│   │   説明: タスク進捗表示コンポーネント
+-+│   │   機能:
+-+│   │   - 個別タスクの進捗状況の表示
+-+│   │   - ステータスの視覚化
+-+│   │   - エラー情報の表示
+-+│   │   - タスクの詳細ログ表示
+-+│   │
+-+│   └── BatchJobSettings.tsx
+-+│       説明: バッチジョブ設定コンポーネント
+-+│       機能:
+-+│       - 並列処理数の調整
+-+│       - リトライ設定の管理
+- │
+- ├── contexts/
+- │   ├── AuthContext.tsx
+-@@ -149,11 +171,19 @@ src/
+- │       - ユーザー固有のプロンプト設定の提供
+- │
+- ├── hooks/
+--│   └── usePrompt.tsx
+--│       説明: プロンプトカスタムフック
+-+│   ├── usePrompt.tsx
+-+│   │   説明: プロンプトカスタムフック
+-+│   │   機能:
+-+│   │   - カスタムプロンプトの状態管理を簡素化
+-+│   │   - コンポーネント間でのプロンプト共有
+-+│   │
+-+│   └── useBatchJob.tsx
+-+│       説明: バッチジョブ管理カスタムフック
+- │       機能:
+--│       - カスタムプロンプトの状態管理を簡素化
+--│       - コンポーネント間でのプロンプト共有
+-+│       - バッチジョブの状態管理
+-+│       - ジョブの作成、開始、キャンセル
+-+│       - 進捗状況の監視
+-+│       - エラーハンドリングとリトライ
+- │
+- ├── lib/
+- │   ├── utils.ts
+-@@ -220,12 +250,28 @@ src/
+- │   │   - 入力情報の検証と処理
+- │   │   - 登録成功後の初期設定ガイド
+- │   │
+--│   └── test-edge-function.tsx
+--│       説明: Edge Function テストページ
+-+│   ├── test-edge-function.tsx
+-+│   │   説明: Edge Function テストページ
+-+│   │   機能:
+-+│   │   - Supabase Edge Functionsのテスト実行
+-+│   │   - 各関数のパラメータ入力と実行結果の表示
+-+│   │   - エラーハンドリングとデバッグ情報の提供
+-+│   │
+-+│   └── batch-jobs.tsx
+-+│       説明: バッチジョブ管理ページ
+- │       機能:
+--│       - Supabase Edge Functionsのテスト実行
+--│       - 各関数のパラメータ入力と実行結果の表示
+--│       - エラーハンドリングとデバッグ情報の提供
+-+│       - バッチジョブの一覧表示
+-+│       - 新規ジョブの作成
+-+│       - ジョブの詳細情報の表示
+-+│       - ジョブログの閲覧
+-+│
+-+├── types/
+-+│   └── batchJob.ts
+-+│       説明: バッチジョブ関連の型定義
+-+│       機能:
+-+│       - ジョブステータスの列挙型
+-+│       - タスク型の定義
+-+│       - ジョブ設定インターフェースの定義
+- │
+- └── i18n.ts
+-     説明: 国際化設定ファイル
+-@@ -305,13 +351,49 @@ supabase/
+- │   │       - 検索クエリの処理と最適化
+- │   │       - 検索結果のフィルタリングとソート
+- │   │
+--│   └── upload/
+-+│   ├── upload/
+-+│   │   └── index.ts
+-+│   │       説明: ファイルアップロード処理関数
+-+│   │       機能:
+-+│   │       - アップロードされたファイルの検証
+-+│   │       - ファイルの保存と管理
+-+│   │       - アップロード結果の返却
+-+│   │
+-+│   ├── batch-job-processor/
+-+│   │   └── index.ts
+-+│   │       説明: バッチジョブ処理関数
+-+│   │       機能:
+-+│   │       - バッチジョブの実行と管理
+-+│   │       - タスクの並列処理
+-+│   │       - 進捗状況の追跡と更新
+-+│   │       - エラーハンドリングとリトライロジック
+-+│   │
+-+│   ├── task-executor/
+-+│   │   └── index.ts
+-+│   │       説明: 個別タスク実行関数
+-+│   │       機能:
+-+│   │       - コンテンツ生成
+-+│   │       - 送信方法の決定（フォームまたはDM）
+-+│   │       - フォーム送信またはDM送信の実行
+-+│   │       - フォールバック処理
+-+│   │       - 詳細なログ記録
+-+│   │
+-+│   ├── job-status-updater/
+-+│   │   └── index.ts
+-+│   │       説明: ジョブステータス更新関数
+-+│   │       機能:
+-+│   │       - バッチジョブの進捗状況の更新
+-+│   │       - 完了したタスクのカウント
+-+│   │       - エラー情報の記録
+-+│   │       - 通知トリガー
+-+│   │
+-+│   └── job-notification/
+- │       └── index.ts
+--│           説明: ファイルアップロード処理関数
+-+│           説明: ジョブ通知関数
+- │           機能:
+--│           - アップロードされたファイルの検証
+--│           - ファイルの保存と管理
+--│           - アップロード結果の返却
+-+│           - ジョブ完了時のユーザー通知
+-+│           - エラー発生時のアラート送信
+-+│           - 進捗状況の定期レポート
+- │
+- ├── utils/
+- │   ├── auth.ts
+-@@ -340,12 +422,25 @@ supabase/
+- │   │   - フォームデータ構造の定義
+- │   │   - フォーム送信リクエストとレスポンスの型定義
+- │   │
+--│   └── formAnalysis.ts
+--│       説明: フォーム分析ユーティリティ
+-+│   ├── formAnalysis.ts
+-+│   │   説明: フォーム分析ユーティリティ
+-+│   │   機能:
+-+│   │   - フォームデータのバリデーション
+-+│   │   - フィールドタイプの推論
+-+│   │   - フォームフィールド値のサニタイズ
+-+│   │
+-+│   ├── batch-job-utils.ts
+-+│   │   説明: バッチジョブユーティリティ関数
+-+│   │   機能:
+-+│   │   - タスクの分割ロジック
+-+│   │   - リトライ戦略の実装
+-+│   │
+-+│   └── job-logger.ts
+-+│       説明: ジョブログ管理ユーティリティ
+- │       機能:
+--│       - フォームデータのバリデーション
+--│       - フィールドタイプの推論
+--│       - フォームフィールド値のサニタイズ
+-+│       - 詳細なログ記録
+-+│       - ログレベルの管理
+-+│       - ログの永続化と検索
+- │
+- └── migrations/
+-     説明: データベースマイグレーションファイル
+-diff --git a/src/lib/supabase.ts b/src/lib/supabase.ts
+-deleted file mode 100644
+-index 939032be..00000000
+---- a/src/lib/supabase.ts
+-+++ /dev/null
+-@@ -1,6 +0,0 @@
+--import { createClient } from '@supabase/supabase-js';
+--
+--const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+--const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+--
+--export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+-\ No newline at end of file
