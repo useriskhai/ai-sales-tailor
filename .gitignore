@@ -1,0 +1,77 @@
+# 依存関係
+/node_modules
+
+# ビルド出力
+/.next
+/out
+tsconfig.tsbuildinfo
+
+# 環境変数
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# Supabase関連
+supabase/.temp/
+supabase/.branches/
+supabase/functions/.env
+supabase/config.toml
+
+# デバッグログ
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+
+# Python関連
+__pycache__/
+*.py[cod]
+*$py.class
+form-auto-fill-service/venv/
+form-auto-fill-service/*.pyc
+form-auto-fill-service/__pycache__/
+form-auto-fill-service/.env
+
+# 仮想環境
+venv/
+*.venv
+env/
+*.env
+
+# IDE・エディタ
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS生成ファイル
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# セキュリティ関連
+*.pem
+*.key
+*.crt
+
+# データベース
+*.sqlite
+*.sqlite3
+*.db
+
+# その他
+*.bak
+*.csv
+.vercel
+docker/volumes/
+docker/data/
