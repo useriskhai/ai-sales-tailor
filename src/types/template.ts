@@ -83,6 +83,7 @@ export interface TemplateSettings {
       };
     };
     customKpi: {
+      find(arg0: (t: any) => boolean): unknown;
       metrics: Array<{
         id: string;
         name: string;
@@ -367,7 +368,7 @@ export interface TemplateContent {
 export interface Template {
   id: string;
   name: string;
-  template_settings: string;  // JSON文字列として保存される設定
+  template_settings: string; // JSON string stored as settings
   category: string;
   created_at: string;
   updated_at: string;
@@ -378,7 +379,11 @@ export interface Template {
   usage_count?: number;
   average_response_rate?: number;
   is_public?: boolean;
+
+  // Add the missing settings property here
+  settings?: TemplateSettings; // Use TemplateSettings for a strongly-typed structure
 }
+
 
 export type ExecutionPriority = 'speed' | 'balanced' | 'quality';
 
