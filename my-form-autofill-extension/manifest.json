@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "フォーム自動入力拡張機能",
+  "version": "1.0",
+  "description": "事前に生成されたデータに基づいてフォームを自動的に入力します",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["utils/formFiller.js", "content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "externally_connectable": {
+    "matches": ["*://localhost:*/*", "https://your-web-app-domain.com/*"]
+  }
+}
