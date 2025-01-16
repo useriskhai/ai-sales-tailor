@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  auth:
+    environment:
+      GOTRUE_LOG_LEVEL: debug
+      GOTRUE_MAILER_AUTOCONFIRM: "true"
+      GOTRUE_DISABLE_SIGNUP: "false"
+      GOTRUE_SITE_URL: "http://localhost:3000"
+      GOTRUE_URI_ALLOW_LIST: "http://localhost:3000"
+      GOTRUE_JWT_EXP: "3600"
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: "authenticated"
+      GOTRUE_SECURITY_REFRESH_TOKEN_ROTATION_ENABLED: "true"
+      GOTRUE_SECURITY_CAPTCHA_ENABLED: "false"
+      GOTRUE_SECURITY_USER_CONFIRMATION_ENABLED: "false"

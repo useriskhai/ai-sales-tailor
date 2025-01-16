@@ -1,0 +1,42 @@
+-- 最低限のシードデータ
+INSERT INTO auth.users (
+  instance_id,
+  id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  last_sign_in_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  is_super_admin,
+  created_at,
+  updated_at,
+  phone,
+  phone_confirmed_at,
+  confirmation_token,
+  email_change,
+  email_change_token_new,
+  recovery_token
+) VALUES (
+  '00000000-0000-0000-0000-000000000000',
+  '00000000-0000-0000-0000-000000000000',
+  'authenticated',
+  'authenticated',
+  'test@example.com',
+  '$2a$10$Nz6PQHqIgY9sMT.UQ4QebeYzwJQqXhqhKGBxKB7PfQZ6X8cbO0Aq6',  -- パスワード: password123
+  now(),
+  now(),
+  '{"provider": "email", "providers": ["email"]}',
+  '{}',
+  false,
+  now(),
+  now(),
+  null,
+  null,
+  null,
+  null,
+  null,
+  null
+);
