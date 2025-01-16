@@ -1,0 +1,5 @@
+{
+  "cron": "* * * * *",
+  "function": "crawl-company",
+  "description": "1分ごとにクロール処理を実行（Firecrawl Professional: 1分60リクエスト）"
+} 
