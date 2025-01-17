@@ -42,6 +42,12 @@ export interface KPISettings {
 }
 
 export interface TemplateSettings {
+  parallelTasks: number,
+  retryAttempts: number,
+  maxDailyTasks: number,
+  errorThreshold: number,
+  pauseOnErrorRate: number,
+  preferredMethod: 'FORM',
   basicInfo: {
     name: string;
     category: string;
@@ -93,6 +99,10 @@ export interface TemplateSettings {
         unit: string;
       }>;
     };
+    overallTarget: {
+      responseRate: number,
+      conversionRate: number,
+    },
     evaluationPeriod: number;
   };
 }
@@ -365,11 +375,10 @@ export interface TemplateContent {
     evaluationPeriod: number;
   };
 }
-
 export interface Template {
   id: string;
   name: string;
-  template_settings: string; // JSON string stored as settings
+  template_settings: string;
   category: string;
   created_at: string;
   updated_at: string;
@@ -384,14 +393,27 @@ export interface Template {
     responseRate: number;
     conversionRate: number; 
     successRate?: number;
+    qualityScore: number;
+    personalizationScore: number;
+    meetingRate: number;
+    errorRate: number;
     averageProcessingTime?: number;
+    testHistory: [];
   };
- 
   settings?: TemplateSettings; 
   description?: string; 
   tags?: string[];
   content?: string;
+  promptConfig?: {
+    strategy: string;
+    toneOfVoice: string;
+    contentFocus: string;
+    maxLength: number;
+    customInstructions: string;
+    outputFormat: string;
+  };
 }
+
 
 
 export type ExecutionPriority = 'speed' | 'balanced' | 'quality';
