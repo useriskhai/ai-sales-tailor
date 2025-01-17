@@ -382,9 +382,13 @@ export interface Template {
   metrics?: {
     responseRate: number;
     conversionRate: number; 
+    successRate?: number;
+    averageProcessingTime?: number;
   };
-  // Add the missing settings property here
-  settings?: TemplateSettings; // Use TemplateSettings for a strongly-typed structure
+ 
+  settings?: TemplateSettings; 
+  description?: string; 
+  tags?: string[];
 }
 
 
