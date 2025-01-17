@@ -178,6 +178,8 @@ export interface BatchJob {
     systemResults: {
       [key: string]: {
         kpiId: string;
+        current: number; 
+        target: number;
         type: 'system';
         value: number;
         targetValue: number;
@@ -191,6 +193,8 @@ export interface BatchJob {
     customResults: {
       [key: string]: {
         kpiId: string;
+        current: number; 
+        target: number;
         type: 'custom';
         value: number;
         targetValue: number;
