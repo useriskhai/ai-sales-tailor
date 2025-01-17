@@ -19,6 +19,15 @@ interface KPIAnalysisPanelProps {
   analysis: KPIAnalysis | null;
   onUpdateCustomKPI: (kpiId: string, value: number) => Promise<void>;
 }
+interface CustomKpi {
+  metrics: {
+    id: string;
+    name: string;
+    target: number;
+    weight: number;
+    unit: string;
+  }[];
+}
 
 export function KPIAnalysisPanel({
   template,
@@ -212,7 +221,8 @@ export function KPIAnalysisPanel({
 
           <TabsContent value="custom" className="space-y-6">
             {Object.entries(analysis.customResults).map(([kpiId, result]: [string, KPIResult]) => {
-              const kpiConfig = template.settings.kpi.customKPIs.find(t => t.id === kpiId);
+              const kpiConfig = template.settings?.kpi.customKpi.metrics.find(t => t.id === kpiId);
+
               if (!kpiConfig) return null;
 
               return (
@@ -229,21 +239,22 @@ export function KPIAnalysisPanel({
                         <div className="relative">
                           <Input
                             type="number"
-                            value={convertValueForEdit(editValue, kpiConfig.unit)}
+                            value={convertValueForEdit(editValue, kpiConfig.unit as CUSTOM_KPI_UNITS)}
                             onChange={(e) => setEditValue(Number(e.target.value))}
                             className="w-32 pr-8"
-                            step={getStepByUnit(kpiConfig.unit)}
-                            min={getMinByUnit(kpiConfig.unit)}
-                            max={getMaxByUnit(kpiConfig.unit)}
+                            step={getStepByUnit(kpiConfig.unit as CUSTOM_KPI_UNITS)}
+                            min={getMinByUnit(kpiConfig.unit as CUSTOM_KPI_UNITS)}
+                            max={getMaxByUnit(kpiConfig.unit as CUSTOM_KPI_UNITS)}
                           />
+
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                            {getUnitLabel(kpiConfig.unit)}
+                            {getUnitLabel(kpiConfig.unit as CUSTOM_KPI_UNITS)}
                           </span>
                         </div>
                         <Button
                           size="sm"
                           variant="ghost"
-                          onClick={() => handleUpdateCustomKPI(kpiId, editValue, kpiConfig.unit)}
+                          onClick={() => handleUpdateCustomKPI(kpiId, editValue, kpiConfig.unit as CUSTOM_KPI_UNITS)}
                         >
                           <CheckIcon className="w-4 h-4" />
                         </Button>
@@ -266,7 +277,7 @@ export function KPIAnalysisPanel({
                           onClick={() => {
                             setEditingKPI(kpiId);
                             // 編集開始時に単位に応じた変換を行う
-                            setEditValue(convertValueForEdit(result.value, kpiConfig.unit));
+                            setEditValue(convertValueForEdit(result.value, kpiConfig.unit as CUSTOM_KPI_UNITS));
                           }}
                         >
                           <PencilIcon className="w-4 h-4" />
