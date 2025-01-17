@@ -379,7 +379,10 @@ export interface Template {
   usage_count?: number;
   average_response_rate?: number;
   is_public?: boolean;
-
+  metrics?: {
+    responseRate: number;
+    conversionRate: number; 
+  };
   // Add the missing settings property here
   settings?: TemplateSettings; // Use TemplateSettings for a strongly-typed structure
 }
