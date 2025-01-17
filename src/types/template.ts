@@ -64,6 +64,7 @@ export interface TemplateSettings {
     preferred_method?: 'FORM' | 'EMAIL' | 'HYBRID';
   };
   kpi: {
+    metrics: any;
     systemKpi: {
       deliveryRate: {
         target: number;
