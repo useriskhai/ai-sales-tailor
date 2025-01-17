@@ -83,8 +83,8 @@ export interface TemplateSettings {
       };
     };
     customKpi: {
-      find(arg0: (t: any) => boolean): unknown;
       metrics: Array<{
+        description: string;
         id: string;
         name: string;
         target: number;
