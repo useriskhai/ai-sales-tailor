@@ -52,7 +52,7 @@ const FOCUS_OPTIONS = Object.entries(MessageStrategyConfig.focus).map(([value, l
 }));
 
 export function TemplateSettingsModal({ template, onSettingsChange }: Props) {
-  const content = JSON.parse(template.content);
+  const content = JSON.parse(template.content || '{}');
   const [settings, setSettings] = useState(content);
   const [isOpen, setIsOpen] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
