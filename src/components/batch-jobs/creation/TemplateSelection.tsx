@@ -51,9 +51,10 @@ export function TemplateSelection({ onSelect, selectedTemplate }: TemplateSelect
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(t => 
         t.name.toLowerCase().includes(term) ||
-        t.description.toLowerCase().includes(term)
+        (t.description?.toLowerCase().includes(term) || false)
       );
     }
+    
 
     // カテゴリーフィルター
     if (selectedCategory !== 'all') {
