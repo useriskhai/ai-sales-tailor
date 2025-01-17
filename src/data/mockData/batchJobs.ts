@@ -88,24 +88,56 @@ export const mockBatchJobs: BatchJob[] = [
         form_link_click: {
           current: 85,
           target: 100,
-          trend: 0.1
+          trend: 0.1,
+          kpiId: '',
+          type: 'system',
+          value: 0,
+          targetValue: 0,
+          achievement: 0,
+          sampleSize: 0,
+          lastUpdated: '',
+          dataSource: 'system'
         },
         form_link_click_rate: {
           current: 0.085,
           target: 0.15,
-          trend: -0.05
+          trend: -0.05,
+          kpiId: '',
+          type: 'system',
+          value: 0,
+          targetValue: 0,
+          achievement: 0,
+          sampleSize: 0,
+          lastUpdated: '',
+          dataSource: 'system'
         }
       },
       customResults: {
         meeting_count: {
           current: 45,
           target: 100,
-          trend: 0.5
+          trend: 0.5,
+          kpiId: '',
+          type: 'custom',
+          value: 0,
+          targetValue: 0,
+          achievement: 0,
+          sampleSize: 0,
+          lastUpdated: '',
+          dataSource: 'manual'
         },
         conversion_rate: {
           current: 0.17,
           target: 0.20,
-          trend: 0.13
+          trend: 0.13,
+          kpiId: '',
+          type: 'custom',
+          value: 0,
+          targetValue: 0,
+          achievement: 0,
+          sampleSize: 0,
+          lastUpdated: '',
+          dataSource: 'manual'
         }
       }
     },
