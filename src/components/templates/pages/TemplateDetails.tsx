@@ -22,7 +22,8 @@ import {
   ToneOfVoice,
   ContentFocus,
   PreferredMethod,
-  MessageStrategyConfig
+  MessageStrategyConfig,
+  TemplateSettings
 } from "@/types/template";
 import {
   Tabs,
