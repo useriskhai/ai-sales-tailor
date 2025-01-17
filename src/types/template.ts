@@ -389,6 +389,7 @@ export interface Template {
   settings?: TemplateSettings; 
   description?: string; 
   tags?: string[];
+  content?: string;
 }
 
 
