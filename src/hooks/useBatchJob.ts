@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import { BatchJob } from '@/types/batchJob';
+import { BatchJob, BatchJobWithProcessedMetrics } from '@/types/batchJob';
 import { mockBatchJobs } from '@/data/mockData/batchJobs';
 import { Task } from '@/types/task';
 
@@ -19,7 +19,7 @@ interface UseBatchJobReturn {
 
 export function useBatchJob() {
   const [jobs, setJobs] = useState<BatchJob[]>(mockBatchJobs); // Initialize with mock data
-  const [job, setJob] = useState<BatchJob | null>(null);
+  const [job, setJob] = useState<BatchJob | BatchJobWithProcessedMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Fetch a single job by ID
