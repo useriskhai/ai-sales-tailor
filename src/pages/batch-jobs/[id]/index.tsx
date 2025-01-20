@@ -20,15 +20,7 @@ import { JobOptimizationPanel } from "@/components/batch-jobs/4-optimization/Job
 import { StatusBadge } from "@/components/batch-jobs/shared/StatusBadge";
 
 import {
-  FileText,
-  Eye,
-  Activity,
-  Settings,
-  ArrowLeft,
-  RefreshCw,
-  PlayCircle,
-  PauseCircle
-} from "lucide-react";
+  FileText, Eye, Activity, Settings, ArrowLeft, RefreshCw, PlayCircle, PauseCircle} from "lucide-react";
 
 // 型変換用のヘルパー関数
 function convertToRawMetrics(job: BatchJobWithProcessedMetrics): BatchJob {
