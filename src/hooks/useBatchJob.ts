@@ -5,14 +5,15 @@ import { BatchJob } from '@/types/batchJob';
 import { mockBatchJobs } from '@/data/mockData/batchJobs';
 
 export function useBatchJob() {
+  const [jobs, setJobs] = useState<BatchJob[]>(mockBatchJobs); // Initialize with mock data
   const [job, setJob] = useState<BatchJob | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Fetch a single job by ID
   const getJob = async (id: string) => {
     setIsLoading(true);
     try {
-      // モックデータを使用
-      const mockJob = mockBatchJobs.find(job => job.id === id);
+      const mockJob = jobs.find(job => job.id === id);
       setJob(mockJob || null);
     } catch (error) {
       console.error('Failed to fetch job:', error);
@@ -22,16 +23,35 @@ export function useBatchJob() {
     }
   };
 
+  // Refresh a specific job's data
   const refreshJob = async () => {
     if (job) {
       await getJob(job.id);
     }
   };
 
+  // Delete a job by ID
+  const deleteJob = async (id: string) => {
+    setIsLoading(true);
+    try {
+      const updatedJobs = jobs.filter(job => job.id !== id);
+      setJobs(updatedJobs);
+      if (job?.id === id) {
+        setJob(null); // Clear the selected job if it was deleted
+      }
+    } catch (error) {
+      console.error('Failed to delete job:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
-    job,
-    isLoading,
-    getJob,
-    refreshJob
+    jobs,         // List of all jobs
+    job,          // Selected job
+    isLoading,    // Loading state
+    getJob,       // Fetch a job
+    refreshJob,   // Refresh a job
+    deleteJob     // Delete a job
   };
 }
