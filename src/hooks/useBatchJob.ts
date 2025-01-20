@@ -3,6 +3,19 @@
 import { useState } from 'react';
 import { BatchJob } from '@/types/batchJob';
 import { mockBatchJobs } from '@/data/mockData/batchJobs';
+import { Task } from '@/types/task';
+
+interface UseBatchJobReturn {
+  job: BatchJob | null;
+  tasks: Task[];
+  isLoading: boolean;
+  startJob: (id: string) => Promise<void>;
+  pauseJob: (id: string) => Promise<void>;
+  getJob: (id: string) => Promise<void>;
+  refreshJob: () => Promise<void>;
+  deleteJob: (id: string) => Promise<void>;
+  jobs: BatchJob[];
+}
 
 export function useBatchJob() {
   const [jobs, setJobs] = useState<BatchJob[]>(mockBatchJobs); // Initialize with mock data
@@ -53,5 +66,5 @@ export function useBatchJob() {
     getJob,       // Fetch a job
     refreshJob,   // Refresh a job
     deleteJob     // Delete a job
-  };
+  } as UseBatchJobReturn;
 }
