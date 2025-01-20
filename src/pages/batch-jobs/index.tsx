@@ -6,16 +6,7 @@ import { useBatchJob } from '@/hooks/useBatchJob';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { 
-  Plus, 
-  FileText, 
-  Users, 
-  Package, 
-  Calendar,
-  Search,
-  Filter,
-  ArrowUpDown,
-  MoreHorizontal
-} from 'lucide-react';
+  Plus, FileText, Users, Package, Calendar, Search, Filter, ArrowUpDown, MoreHorizontal} from 'lucide-react';
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { StatusBadge } from "@/components/batch-jobs/shared/StatusBadge";
