@@ -101,7 +101,7 @@ export default function BatchJobDetailsPage() {
     }
   };
 
-  const convertedJob = job ? convertToRawMetrics(job) : null;
+  const convertedJob = job ? convertToRawMetrics() : null;
   const generationTasks = tasks ? convertToGenerationTasks(tasks) : [];
 
   if (isLoading) {
