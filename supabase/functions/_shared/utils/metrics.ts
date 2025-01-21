@@ -1,4 +1,4 @@
-import { createClient } from 'npm:@supabase/supabase-js@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.1';
 import { ProcessMetrics } from '../types/queue.ts';
 import { Database } from '../database.types.ts';
 
