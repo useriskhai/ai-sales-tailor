@@ -23,31 +23,29 @@ import {
   FileText, Eye, Activity, Settings, ArrowLeft, RefreshCw, PlayCircle, PauseCircle} from "lucide-react";
 
 // 型変換用のヘルパー関数
-function convertToRawMetrics(job: BatchJobWithProcessedMetrics): BatchJob {
-  if (!job.metrics) return job as BatchJob;
-
-  const rawMetrics: RawBatchJobMetrics = {
-    response_rate: job.metrics.responseRate,
-    conversion_rate: job.metrics.conversionRate,
-    success_rate: job.metrics.successRate,
-    average_processing_time: job.metrics.averageProcessingTime,
-    target_processing_time: job.metrics.targetProcessingTime,
-    concurrent_tasks: job.metrics.concurrentTasks,
-    max_concurrent_tasks: job.metrics.maxConcurrentTasks,
-    industryPerformance: job.metrics.industryPerformance ? 
+function convertToProcessedMetrics(job: BatchJob): BatchJobWithProcessedMetrics {
+  const processedMetrics = {
+    responseRate: job.metrics?.response_rate ?? 0,
+    conversionRate: job.metrics?.conversion_rate ?? 0,
+    successRate: job.metrics?.success_rate ?? 0,
+    averageProcessingTime: job.metrics?.average_processing_time ?? 0,
+    targetProcessingTime: job.metrics?.target_processing_time ?? 0,
+    concurrentTasks: job.metrics?.concurrent_tasks ?? 0,
+    maxConcurrentTasks: job.metrics?.max_concurrent_tasks ?? 0,
+    industryPerformance: job.metrics?.industryPerformance ? 
       Object.entries(job.metrics.industryPerformance).reduce((acc, [key, value]) => ({
         ...acc,
         [key]: {
-          response_rate: value.responseRate,
-          conversion_rate: value.conversionRate
+          responseRate: value.response_rate,
+          conversionRate: value.conversion_rate
         }
       }), {}) : undefined
   };
 
   return {
     ...job,
-    metrics: rawMetrics
-  } as BatchJob;
+    metrics: processedMetrics
+  } as BatchJobWithProcessedMetrics;
 }
 
 // Task[] から GenerationTask[] への変換関数
@@ -101,7 +99,6 @@ export default function BatchJobDetailsPage() {
     }
   };
 
-  const convertedJob = job ? convertToRawMetrics() : null;
   const generationTasks = tasks ? convertToGenerationTasks(tasks) : [];
 
   if (isLoading) {
@@ -131,9 +128,9 @@ export default function BatchJobDetailsPage() {
         </TabsList>
 
         <TabsContent value="generation" className="space-y-6">
-          <GenerationProgress job={convertedJob} tasks={generationTasks} />
+          <GenerationProgress job={job} tasks={generationTasks} />
           <BatchGeneration 
-            job={convertedJob} 
+            job={job} 
             tasks={generationTasks}
             onApprove={(taskIds) => {
               console.log('Approve tasks:', taskIds);
@@ -142,15 +139,15 @@ export default function BatchJobDetailsPage() {
         </TabsContent>
 
         <TabsContent value="delivery">
-          <JobMonitoringDashboard job={convertedJob} />
+          <JobMonitoringDashboard job={job} />
         </TabsContent>
 
         <TabsContent value="analysis">
-          <BatchJobKPIDashboard job={convertedJob} />
+          <BatchJobKPIDashboard job={job} />
         </TabsContent>
 
         <TabsContent value="optimization">
-          <JobOptimizationPanel job={convertedJob} />
+          <JobOptimizationPanel job={job} />
         </TabsContent>
       </Tabs>
     </div>
