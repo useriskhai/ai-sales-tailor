@@ -368,10 +368,21 @@ export interface BatchJob {
   };
 }
 
-export interface BatchJobWithProcessedMetrics extends Omit<BatchJob, 'metrics'> {
-  metrics?: BatchJobMetrics;
-  analytics?: BatchJobAnalytics;
-}
+export type BatchJobWithProcessedMetrics = BatchJob & {
+  metrics: {
+    responseRate: number;
+    conversionRate: number;
+    successRate: number;
+    averageProcessingTime: number;
+    targetProcessingTime: number;
+    concurrentTasks: number;
+    maxConcurrentTasks: number;
+    industryPerformance?: Record<
+      string,
+      { responseRate: number; conversionRate: number }
+    >;
+  };
+};
 
 export interface JobHistoryResponse {
   data: BatchJob[];
@@ -407,3 +418,4 @@ export interface JobConfig {
   product?: Product;
   settings?: JobSettings;
 }
+
