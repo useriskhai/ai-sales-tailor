@@ -1,5 +1,5 @@
 /// <reference lib="dom" />
-import { JSDOM } from 'npm:jsdom'
+import { DOMParser, Document } from "https://deno.land/x/deno_dom@v0.1.49/deno-dom-wasm.ts";
 
 export interface CompanyInfo {
   name: string;
@@ -25,10 +25,17 @@ export interface CompanyExtractResult {
 }
 
 export class CompanyExtractor {
-  async extract(html: string, url: string): Promise<CompanyExtractResult> {
+  extract(html: string, url: string): CompanyExtractResult {
     try {
-      const dom = new JSDOM(html)
-      const document = dom.window.document
+      const parser = new DOMParser();
+      const document = parser.parseFromString(html, "text/html");
+      if (!document) {
+        return {
+          success: false,
+          error: 'Failed to parse HTML',
+          confidence: 0
+        };
+      }
 
       // メタ情報から説明文を抽出
       const description = this.extractDescription(document);
@@ -39,7 +46,7 @@ export class CompanyExtractor {
           success: false,
           confidence: 0,
           error: '会社名が見つかりませんでした'
-        }
+        };
       }
 
       return {
@@ -60,14 +67,14 @@ export class CompanyExtractor {
           }
         },
         confidence: 1.0
-      }
+      };
 
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : '会社名の取得に失敗しました',
         confidence: 0
-      }
+      };
     }
   }
 
@@ -120,9 +127,6 @@ export class CompanyExtractor {
   }
 
   private extractCompanyName(document: Document, url: string): string | null {
-    // メタタグのエンコーディングを確認
-    const charset = document.querySelector('meta[charset], meta[http-equiv="Content-Type"]')?.getAttribute('charset') || 'utf-8';
-    
     // テキストコンテンツを適切にデコードする関数
     const decodeText = (text: string | null | undefined): string | null => {
       if (!text) return null;
@@ -196,7 +200,7 @@ export class CompanyExtractor {
 
   private cleanCompanyName(name: string): string | null {
     // HTMLエンティティをデコード
-    let decoded = name
+    const decoded = name
       .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
@@ -206,7 +210,7 @@ export class CompanyExtractor {
       .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(parseInt(dec, 10)));
 
     // 不要な文字列を削除
-    let cleaned = decoded
+    const cleaned = decoded
       .replace(/｜.+$/, '') // 区切り文字以降を削除
       .replace(/[-|｜].+$/, '') // ハイフン以降を削除
       .replace(/\s*[\/|｜|-].+$/, '') // スラッシュ以降を削除
