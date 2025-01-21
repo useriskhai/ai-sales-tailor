@@ -37,7 +37,7 @@ const TemplatesPage: NextPage = () => {
         <meta name="description" content="SalesTailorのテンプレート管理ページです。" />
       </Head>
       <div className="container mx-auto p-4">
-        <TemplateManager onTemplateCreated={handleTemplateCreated} />
+        <TemplateManager onTemplateCreatedAction={handleTemplateCreated} />
         <Toaster />
       </div>
     </>
