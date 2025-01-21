@@ -398,7 +398,15 @@ export interface Template {
     meetingRate: number;
     errorRate: number;
     averageProcessingTime?: number;
-    testHistory: [];
+    testHistory: Array<{
+      testId: string;
+      startDate: string;
+      endDate: string;
+      variants: Array<{
+        variantId: string;
+        metrics: Record<string, number>;
+      }>;
+    }>;
   };
   settings?: TemplateSettings; 
   description?: string; 
