@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface TemplateManagerProps {
-  onTemplateCreated: (newTemplate: Template) => void;
+  onTemplateCreatedAction: (newTemplate: Template) => void;
 }
 
 interface FilterState {
@@ -31,7 +31,7 @@ interface FilterState {
   sortOrder: 'asc' | 'desc';
 }
 
-export function TemplateManager({ onTemplateCreated }: TemplateManagerProps) {
+export function TemplateManager({ onTemplateCreatedAction }: TemplateManagerProps) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -94,7 +94,7 @@ export function TemplateManager({ onTemplateCreated }: TemplateManagerProps) {
       const data = await fetchTemplates();
       if (data) {
         setTemplates(data);
-        onTemplateCreated(data[0]);
+        onTemplateCreatedAction(data[0]);
       }
     } catch (error) {
       console.error('テンプレート読み込みエラー:', error);
