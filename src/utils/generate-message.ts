@@ -50,6 +50,9 @@ function validateTemplateContent(content: any): content is TemplateContent {
 function generatePrompt(template: Template, product: Product, company: Company): string {
   let templateContent: TemplateContent;
   try {
+    if (!template.content) {
+      throw new Error('テンプレートのcontentが未設定です');
+    }
     const parsedContent = JSON.parse(template.content);
     if (!validateTemplateContent(parsedContent)) {
       throw new Error('テンプレートの形式が不正です');
