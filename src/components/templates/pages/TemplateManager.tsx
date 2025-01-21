@@ -31,7 +31,7 @@ interface FilterState {
   sortOrder: 'asc' | 'desc';
 }
 
-export function TemplateManager() {
+export function TemplateManager({ onTemplateCreated }: TemplateManagerProps) {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -94,6 +94,7 @@ export function TemplateManager() {
       const data = await fetchTemplates();
       if (data) {
         setTemplates(data);
+        onTemplateCreated(data[0]);
       }
     } catch (error) {
       console.error('テンプレート読み込みエラー:', error);
